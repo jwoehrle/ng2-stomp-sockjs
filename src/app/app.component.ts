@@ -1,35 +1,30 @@
-import {Component, OnInit} from '@angular/core';
-
-//import * as sockjs from 'sockjs-client';
-import * as stompjs from 'stompjs';
-import * as SockJS from "sockjs-client";
-import {Client, Frame, Message} from "stompjs";
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {MessageService} from "./message.service";
+import {Subscription} from "rxjs/Subscription";
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit{
+export class AppComponent implements OnInit, OnDestroy {
   title = 'app works!';
-
-  stompClient: Client;
-
   messages: Array<string> = [];
 
+  messageSub: Subscription;
+
+  constructor(private messageService: MessageService) {
+  }
+
+
+
   ngOnInit(): void {
+    this.messageSub = this.messageService.messageReceived$.subscribe( message => this.messages.push(message));
+  }
 
-    const socket = new SockJS('http://localhost:8080/gs-guide-websocket') as WebSocket;
-    this.stompClient = stompjs.over(socket);
-    this.stompClient.connect('', '', (frame: Frame) => {
-      console.log('CONNECT CONNECT');
-      this.stompClient.subscribe('/topic/greetings', (message : Message ) => {
-        console.log('Received greeting:', message.body);
-        let json = JSON.parse(message.body);
-        this.messages.push(json['content']);
-        console.log(this.messages);
-      });
-    });
-
+  ngOnDestroy(): void {
+    if ( this.messageSub ) {
+      this.messageSub.unsubscribe();
+    }
   }
 }

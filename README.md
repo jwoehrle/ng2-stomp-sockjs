@@ -1,5 +1,7 @@
 # WebsocketClient
 
+Example Angular2 App which connects to the [spring stomp websocket example](https://spring.io/guides/gs/messaging-stomp-websocket/)
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.0.4.
 
 ## Development server
